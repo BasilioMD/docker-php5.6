@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+
+  miapache5:
+    build: ./web
+    volumes:
+      - ./web:/var/www/html
+    ports:
+      - 88:80
+    links:
+      - bbdd5
+
+  bbdd5:
+    build: ./bd
+    environment:
+      - MYSQL_DATABASE=bbdd
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    ports:
+      - 3366:3306
+    volumes:
+      - ./bd:/docker-entrypoint-initdb.d
+      - ./bd/data:/var/lib/mysql
+
+  miadmin5:
+    build: ./phpmyadmin
+    environment:
+      - PMA_HOST=bbdd5
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user
+    ports:
+      - 888:80
+    links:
+      - bbdd5
+    depends_on:
+      - bbdd5
